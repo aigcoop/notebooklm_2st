@@ -64,6 +64,9 @@ h1{font-family:var(--display);font-size:clamp(24px,5vw,32px);margin:0;text-wrap:
 .btn.share{border-color:var(--accent);color:var(--accent)}
 .info a{color:var(--accent)}
 .sharebox{font:inherit;font-size:12.5px;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--fg);min-width:0;width:100%}
+.btn.share.go{background:var(--accent);color:var(--accent-ink)}
+.row2{display:flex;gap:6px;flex-wrap:wrap}
+.inapp{margin-top:16px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:12px 14px;display:grid;gap:8px;font-size:14px}
 .card.hl{outline:3px solid var(--accent);outline-offset:2px}
 .btn[disabled]{opacity:.55;cursor:progress}
 .notice{font-size:12.5px;color:var(--muted);border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:0 0 12px}
@@ -88,6 +91,11 @@ h1{font-family:var(--display);font-size:clamp(24px,5vw,32px);margin:0;text-wrap:
 <div class="wrap">
   <h1>정기구독 자료실</h1>
   <p class="sub">세트별 제품 이미지와 교육 PDF를 한 번에 받아 보세요.</p>
+  <div class="inapp" id="inapp" hidden>
+    <b>카카오톡·네이버 앱 안에서 열려 있어요.</b>
+    <span>이 화면에서는 파일 공유 창이 열리지 않아요. 크롬(안드로이드)이나 사파리(아이폰)로 열면 이미지와 PDF가 카톡방에 파일로 바로 공유돼요.</span>
+    <button class="btn primary" id="inapp-open">다른 브라우저로 열기</button>
+  </div>
   <div class="tabs" role="tablist" id="tabs"></div>
   <div id="panel"></div>
 </div>
@@ -141,15 +149,56 @@ async function save(filename, blob){
   const u = URL.createObjectURL(blob); saveUrl(filename, u);
   setTimeout(() => URL.revokeObjectURL(u), 60000); toast("저장했어요: " + filename); return true;
 }
-async function shareOrCopy(title, url, box){
-  if(navigator.share){
-    try{ await navigator.share({title, text: title, url}); return; }
-    catch(e){ if(e && e.name === "AbortError") return; }
-  }
-  try{ await navigator.clipboard.writeText(title + "\n" + url); toast("공유 링크를 복사했어요. 카톡·문자·메일에 붙여넣기 하세요."); }
-  catch(e){ if(box){ box.value = url; box.hidden = false; box.select(); } toast("주소를 길게 눌러 복사해 주세요."); }
-}
 async function getBlob(f){ const r = await fetch("f/"+f); if(!r.ok) throw new Error(r.status); return r.blob(); }
+
+/* ---------- 파일 그대로 공유 (Web Share API) ---------- */
+const fileCache = new Map();
+async function fileFor(x){
+  if(fileCache.has(x.f)) return fileCache.get(x.f);
+  const blob = await getBlob(x.f);
+  const file = new File([blob], x.dl, {type: x.f.endsWith(".pdf") ? "application/pdf" : "image/jpeg"});
+  fileCache.set(x.f, file); return file;
+}
+function prefetch(list){ list.forEach(x => fileFor(x).catch(() => {})); }
+const canShareFiles = () => {
+  try{ return !!(navigator.share && navigator.canShare && navigator.canShare({files:[new File(["x"], "t.jpg", {type:"image/jpeg"})]})); }
+  catch(e){ return false; }
+};
+const IN_APP = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent);
+
+/* list: 공유할 파일들, btn: 누른 버튼, label: 버튼 원래 글자 */
+async function shareFiles(list, btn, label){
+  if(!canShareFiles()){ noShareFallback(list); return; }
+  const ready = list.every(x => fileCache.has(x.f));
+  if(!ready){
+    btn.disabled = true; btn.textContent = "파일 준비 중…";
+    try{ await Promise.all(list.map(fileFor)); }
+    catch(e){ btn.disabled = false; btn.textContent = label; toast("파일을 불러오지 못했어요. 다시 눌러 주세요."); return; }
+    btn.disabled = false;
+  }
+  const files = list.map(x => fileCache.get(x.f));
+  if(!navigator.canShare({files})){ btn.textContent = label; noShareFallback(list); return; }
+  try{
+    await navigator.share({files});
+    btn.textContent = label; btn.classList.remove("go");
+  }catch(e){
+    if(e && e.name === "AbortError"){ btn.textContent = label; btn.classList.remove("go"); return; }
+    // 파일을 받는 동안 '누름' 효과가 끝난 경우: 한 번 더 누르면 바로 열려요
+    btn.textContent = "▶ 한 번 더 눌러 공유"; btn.classList.add("go");
+    toast("파일 준비 완료! 버튼을 한 번 더 누르면 공유 창이 열려요.");
+  }
+}
+function noShareFallback(list){
+  if(IN_APP){ $("#inapp").hidden = false; $("#inapp").scrollIntoView({block:"start"}); toast("카톡 안에서는 파일 공유가 막혀 있어요. 위 안내대로 다른 브라우저로 열어 주세요."); return; }
+  toast("이 기기는 파일 바로 공유를 지원하지 않아요. 파일을 저장한 뒤 보내 주세요.");
+  if(list.length === 1) saveUrl(list[0].dl, "f/" + list[0].f);
+}
+function openExternal(){
+  const url = location.href;
+  if(/KAKAOTALK/i.test(navigator.userAgent)){ location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(url); return; }
+  if(/Android/i.test(navigator.userAgent)){ location.href = "intent://" + url.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end"; return; }
+  navigator.clipboard?.writeText(url).then(() => toast("주소를 복사했어요. 사파리에 붙여넣어 열어 주세요."), () => {});
+}
 
 async function busy(btn, label, fn){
   const old = btn.textContent; btn.disabled = true; btn.textContent = label;
@@ -166,9 +215,8 @@ function card(x, kind){
     <div class="meta"><div class="name">${esc(x.n)}</div><div class="info">${info} · <a href="f/${x.f}" target="_blank" rel="noopener">미리보기</a></div>
       <div class="acts">
         <button class="btn primary" data-dl="${x.f}" data-name="${esc(x.dl)}">⬇ 다운로드</button>
-        <button class="btn share" data-share="${tok}" data-title="${esc(x.n)}">↗ 공유</button>
+        <button class="btn share" data-share="${tok}" data-label="↗ 파일 공유">↗ 파일 공유</button>
       </div>
-      <input class="sharebox" type="text" readonly hidden aria-label="공유 링크">
       ${kind==="pdf"?`<button class="btn" data-text="${esc(x.n.replace(/\s*교육자료$/,"")+" "+PROMPT)}">이 제품 프롬프트 복사</button>`:""}
       </div></article>`;
 }
@@ -176,7 +224,6 @@ function card(x, kind){
 function render(id){
   const s = SETS.find(x => x.id===id) || SETS[0];
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.id===s.id));
-  const link = PAGE_URL + "#" + s.id;
   $("#panel").innerHTML = `<section class="panel" role="tabpanel">
     <div class="summary">
       <img src="${s.cover}" alt="${esc(s.name)}">
@@ -185,9 +232,8 @@ function render(id){
         <div class="price"><b>${s.price}</b>${s.was?`<s>${s.was}</s>`:""}<span class="bv">BV ${s.bv}</span></div>
         <ul class="items">${s.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
         <div class="share">
-          <button class="btn" data-copy="${link}">↗ 이 탭 공유</button>
+          <button class="btn share" data-shareall="all" data-label="↗ 이 세트 파일 전체 공유">↗ 이 세트 파일 전체 공유</button>
           <button class="btn" data-zip="all">이미지+PDF 전체 받기 (ZIP)</button>
-          <input type="text" id="link-${s.id}" value="${link}" readonly hidden style="flex:1 1 220px;min-width:0;font:inherit;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--fg)">
         </div>
       </div>
     </div>
@@ -199,33 +245,46 @@ function render(id){
     </div>
     <section>
       <div class="sec-head"><h3>제품 이미지<span>${s.images.length}개</span></h3>
-        <button class="btn" data-zip="images">이미지 전체 받기 (ZIP)</button></div>
+        <div class="row2"><button class="btn share" data-shareall="images" data-label="↗ 이미지 한번에 공유">↗ 이미지 한번에 공유</button>
+        <button class="btn" data-zip="images">이미지 전체 받기 (ZIP)</button></div></div>
       <div class="grid">${s.images.map(x=>card(x,"img")).join("")}</div>
     </section>
     <section>
       <div class="sec-head"><h3>교육 PDF<span>${s.pdfs.length}개</span></h3>
-        <button class="btn" data-zip="pdfs">PDF 전체 받기 (ZIP)</button></div>
+        <div class="row2"><button class="btn share" data-shareall="pdfs" data-label="↗ PDF 한번에 공유">↗ PDF 한번에 공유</button>
+        <button class="btn" data-zip="pdfs">PDF 전체 받기 (ZIP)</button></div></div>
       <p class="notice">자료 표지 안내대로 내부 교육용 자료예요. 외부 게시·배포는 피해 주세요.</p>
       <div class="grid pdf-grid">${s.pdfs.map(x=>card(x,"pdf")).join("")}</div>
     </section></section>`;
   try{ localStorage.setItem("tab", s.id); }catch(e){}
   current = s;
+  if(canShareFiles()) prefetch(s.images);   // 이미지는 미리 받아 두어 한 번에 공유 창이 열리게
 }
 
 let current;
 $("#tabs").innerHTML = SETS.map(s => `<button class="tab" role="tab" data-id="${s.id}">${s.tab}<small>${s.name}</small></button>`).join("");
 $("#tabs").addEventListener("click", e => { const t = e.target.closest(".tab"); if(t) render(t.dataset.id); });
 
+// PDF는 버튼을 누르기 시작하는 순간 미리 받기 시작
+$("#panel").addEventListener("pointerdown", e => {
+  if(!canShareFiles()) return;
+  const sh = e.target.closest("[data-share]"), sa = e.target.closest("[data-shareall]");
+  if(sh){ const x = [...current.images, ...current.pdfs].find(x => x.f.replace(".","-") === sh.dataset.share); if(x) fileFor(x).catch(()=>{}); }
+  if(sa){ const k = sa.dataset.shareall; prefetch(k === "images" ? current.images : k === "pdfs" ? current.pdfs : [...current.images, ...current.pdfs]); }
+});
+$("#inapp-open").addEventListener("click", openExternal);
+if(IN_APP && !canShareFiles()) $("#inapp").hidden = false;
+
 $("#panel").addEventListener("click", e => {
-  const d = e.target.closest("[data-dl]"), z = e.target.closest("[data-zip]"), c = e.target.closest("[data-copy]");
+  const d = e.target.closest("[data-dl]"), z = e.target.closest("[data-zip]");
   if(d){ saveUrl(d.dataset.name, "f/" + d.dataset.dl); toast("저장을 시작했어요: " + d.dataset.name); }
-  if(c) shareOrCopy(`[${current.tab}] ${current.name} 자료`, c.dataset.copy, c.parentElement.querySelector("input"));
   const sh = e.target.closest("[data-share]");
   if(sh){
     const file = [...current.images, ...current.pdfs].find(x => x.f.replace(".","-") === sh.dataset.share);
-    const url = new URL("f/" + file.f, location.href).href;
-    shareOrCopy(`[${current.tab} ${current.name}] ${sh.dataset.title}`, url, sh.closest(".card").querySelector(".sharebox"));
+    shareFiles([file], sh, sh.dataset.label);
   }
+  const sa = e.target.closest("[data-shareall]");
+  if(sa){ const k = sa.dataset.shareall; shareFiles(k === "images" ? current.images : k === "pdfs" ? current.pdfs : [...current.images, ...current.pdfs], sa, sa.dataset.label); }
   const tx = e.target.closest("[data-text]");
   if(tx){ navigator.clipboard.writeText(tx.dataset.text).then(()=>toast("프롬프트를 복사했어요."), ()=>{ const r=document.createRange(); const p=tx.closest(".prompt")?.querySelector("p"); if(p){ r.selectNodeContents(p); const s=getSelection(); s.removeAllRanges(); s.addRange(r); } toast("문장을 길게 눌러 복사해 주세요."); }); }
   if(z) busy(z, "묶는 중…", async () => {
