@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>정기구독 자료실</title>
+<meta property="og:title" content="정기구독 자료실">
+<meta property="og:description" content="CK파워 M 세트 · 한달 건강 세트 제품 이미지와 교육 자료">
+<meta property="og:image" content="f/s2-set.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: 좁은 단일 컬럼 자료실. 상단 탭 → 세트 요약 → 이미지 그리드 → PDF 목록 */
+:root{
+  --bg:#f6f5f2; --surface:#ffffff; --line:#e4e1da; --fg:#22211e; --muted:#6d6a62;
+  --accent:#9a7a2c; --accent-ink:#ffffff; --accent-soft:#f3ecda; --ok:#2f7a4f;
+  --display:"Gowun Batang",Georgia,serif; --body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17160f; --surface:#211f19; --line:#36332b; --fg:#ece8de; --muted:#a39e91;
+  --accent:#d1ae5c; --accent-ink:#1a170f; --accent-soft:#2d2818; --ok:#6cc08f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17160f; --surface:#211f19; --line:#36332b; --fg:#ece8de; --muted:#a39e91;
+  --accent:#d1ae5c; --accent-ink:#1a170f; --accent-soft:#2d2818; --ok:#6cc08f; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+h1{font-family:var(--display);font-size:clamp(24px,5vw,32px);margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0}
+.tabs{display:flex;gap:6px;margin:22px 0 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;border:0;background:none;color:var(--muted);font:inherit;font-weight:700;padding:12px 16px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--fg);border-color:var(--accent)}
+.tab small{display:block;font-weight:400;font-size:12px}
+.tab:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{display:grid;gap:30px;padding-top:24px}
+.summary{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.summary img{width:100%;border-radius:6px;background:#fff}
+.summary h2{font-family:var(--display);font-size:22px;margin:0}
+.price{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 10px;font-variant-numeric:tabular-nums}
+.price b{font-size:18px}
+.price .bv{color:var(--accent);font-weight:700}
+.price s{color:var(--muted)}
+.items{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.items li{font-size:13px;background:var(--accent-soft);padding:3px 9px;border-radius:99px}
+.share{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.sec-head h3{margin:0;font-size:17px}
+.sec-head h3 span{color:var(--muted);font-weight:400;font-size:14px;margin-left:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.thumb{aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;max-width:100%}
+.thumb img{width:100%;height:100%;object-fit:contain}
+.pdf .thumb{aspect-ratio:16/9;background:#e9e7e2}
+.pdf .thumb img{object-fit:cover}
+.meta{padding:10px 12px 12px;display:grid;gap:8px;flex:1}
+.meta .name{font-weight:500;line-height:1.35}
+.meta .info{color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:6px;margin-top:auto}
+.btn{appearance:none;font:inherit;font-size:13.5px;font-weight:500;border-radius:7px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.acts .btn{flex:1}
+.btn.share{border-color:var(--accent);color:var(--accent)}
+.info a{color:var(--accent)}
+.sharebox{font:inherit;font-size:12.5px;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--fg);min-width:0;width:100%}
+.card.hl{outline:3px solid var(--accent);outline-offset:2px}
+.btn[disabled]{opacity:.55;cursor:progress}
+.notice{font-size:12.5px;color:var(--muted);border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:0 0 12px}
+.prompt{background:var(--accent-soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.prompt .label{font-size:12px;letter-spacing:.06em;color:var(--accent);font-weight:700}
+.prompt p{margin:0;font-size:16px;font-weight:500;line-height:1.5}
+.prompt .how{font-size:12.5px;color:var(--muted)}
+.prompt .row{display:flex;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;max-width:calc(100% - 32px)}
+@media (max-width:560px){
+  .summary{grid-template-columns:minmax(0,1fr)}
+  .summary img{max-width:240px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pdf-grid{grid-template-columns:minmax(0,1fr)}
+
+}
+@media (prefers-reduced-motion:no-preference){.btn{transition:filter .15s}.btn:hover{filter:brightness(.95)}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>정기구독 자료실</h1>
+  <p class="sub">세트별 제품 이미지와 교육 PDF를 한 번에 받아 보세요.</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div id="panel"></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const PAGE_URL = location.origin + location.pathname;
+const PROMPT = "제품의 효능과 먹는법을 한장으로 볼 수 있도록 인포그래픽으로 만들어줘.";
+const SETS = [
+  { id:"sub1", tab:"정기구독 1", name:"CK파워 M 세트", price:"139,000원", bv:"60", cover:"f/s1-set.jpg",
+    items:["씨케이 밸런스 파워 5Vial","제너럴 밸런스 식물성 MSM"],
+    images:[
+      {f:"s1-set.jpg",n:"CK파워 M 세트 구성",dl:"정기구독1_CK파워M세트_구성.jpg",size:100167},
+      {f:"s1-ck.jpg",n:"씨케이 밸런스 파워 5Vial",dl:"정기구독1_씨케이밸런스파워.jpg",size:53027},
+      {f:"s1-msm.jpg",n:"제너럴 밸런스 식물성 MSM",dl:"정기구독1_식물성MSM.jpg",size:28573},
+      {f:"s1-ck-info.jpg",n:"씨케이 밸런스 파워 제품정보",dl:"정기구독1_씨케이밸런스파워_제품정보.jpg",size:80527}],
+    pdfs:[
+      {f:"s1-ck.pdf",c:"s1-ck-cover.jpg",n:"씨케이 밸런스 파워 교육자료",dl:"씨케이밸런스파워_교육자료.pdf",pages:50,size:6659974},
+      {f:"s1-msm.pdf",c:"s1-msm-cover.jpg",n:"제너럴 밸런스 식물성 MSM 교육자료",dl:"식물성MSM_교육자료.pdf",pages:16,size:1588853}]},
+  { id:"sub2", tab:"정기구독 2", name:"한달 건강 세트", price:"144,000원", was:"154,700원", bv:"50", cover:"f/s2-set.jpg",
+    items:["알티지 플러스","비타민 C","식물성 MSM","프로바이오틱스 플러스","디엘릭서 브라운 효소"],
+    images:[
+      {f:"s2-set-detail.jpg",n:"한달 건강 세트 구성 상세",dl:"정기구독2_한달건강세트_구성상세.jpg",size:222537},
+      {f:"s2-set.jpg",n:"한달 건강 세트 대표 이미지",dl:"정기구독2_한달건강세트.jpg",size:22568},
+      {f:"s2-items.jpg",n:"구성품 5종 목록",dl:"정기구독2_구성품목록.jpg",size:72704},
+      {f:"s2-rtg.jpg",n:"제너럴 밸런스 알티지 플러스",dl:"정기구독2_알티지플러스.jpg",size:79769},
+      {f:"s2-msm.jpg",n:"제너럴 밸런스 식물성 MSM",dl:"정기구독2_식물성MSM.jpg",size:28573},
+      {f:"s2-vitc.jpg",n:"제너럴 밸런스 비타민 C",dl:"정기구독2_비타민C.jpg",size:36011},
+      {f:"s2-probiotics.jpg",n:"제너럴 밸런스 프로바이오틱스 플러스",dl:"정기구독2_프로바이오틱스플러스.jpg",size:49166},
+      {f:"s2-elixir.jpg",n:"지쿱 디엘릭서 브라운 효소",dl:"정기구독2_디엘릭서브라운효소.jpg",size:45693}],
+    pdfs:[
+      {f:"s2-rtg.pdf",c:"s2-rtg-cover.jpg",n:"알티지 플러스 (종합비타민) 교육자료",dl:"알티지플러스_교육자료.pdf",pages:42,size:4821816},
+      {f:"s2-vitc.pdf",c:"s2-vitc-cover.jpg",n:"비타민 C 교육자료",dl:"비타민C_교육자료.pdf",pages:24,size:2880747},
+      {f:"s2-msm.pdf",c:"s2-msm-cover.jpg",n:"식물성 MSM 교육자료",dl:"식물성MSM_교육자료.pdf",pages:16,size:1588853},
+      {f:"s2-probiotics.pdf",c:"s2-probiotics-cover.jpg",n:"프로바이오틱스 플러스 교육자료",dl:"프로바이오틱스플러스_교육자료.pdf",pages:40,size:4954965},
+      {f:"s2-elixir.pdf",c:"s2-elixir-cover.jpg",n:"디엘릭서 브라운 효소 교육자료",dl:"디엘릭서브라운효소_교육자료.pdf",pages:28,size:2492965}]}
+];
+
+const $ = s => document.querySelector(s);
+const fmt = b => b >= 1048576 ? (b/1048576).toFixed(1)+"MB" : Math.round(b/1024)+"KB";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,2600); }
+
+function saveUrl(filename, href){
+  const a = document.createElement("a"); a.href = href; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+async function save(filename, blob){
+  const u = URL.createObjectURL(blob); saveUrl(filename, u);
+  setTimeout(() => URL.revokeObjectURL(u), 60000); toast("저장했어요: " + filename); return true;
+}
+async function shareOrCopy(title, url, box){
+  if(navigator.share){
+    try{ await navigator.share({title, text: title, url}); return; }
+    catch(e){ if(e && e.name === "AbortError") return; }
+  }
+  try{ await navigator.clipboard.writeText(title + "\n" + url); toast("공유 링크를 복사했어요. 카톡·문자·메일에 붙여넣기 하세요."); }
+  catch(e){ if(box){ box.value = url; box.hidden = false; box.select(); } toast("주소를 길게 눌러 복사해 주세요."); }
+}
+async function getBlob(f){ const r = await fetch("f/"+f); if(!r.ok) throw new Error(r.status); return r.blob(); }
+
+async function busy(btn, label, fn){
+  const old = btn.textContent; btn.disabled = true; btn.textContent = label;
+  try{ await fn(); } catch(e){ toast("파일을 불러오지 못했어요. 다시 시도해 주세요."); }
+  finally{ btn.disabled = false; btn.textContent = old; }
+}
+
+function card(x, kind){
+  const src = kind==="pdf" ? x.c : x.f;
+  const info = kind==="pdf" ? `PDF · ${x.pages}쪽 · ${fmt(x.size)}` : `JPG · ${fmt(x.size)}`;
+  const tok = x.f.replace(".","-");
+  return `<article class="card ${kind}" id="${tok}">
+    <div class="thumb"><img src="f/${src}" alt="${esc(x.n)}" loading="lazy"></div>
+    <div class="meta"><div class="name">${esc(x.n)}</div><div class="info">${info} · <a href="f/${x.f}" target="_blank" rel="noopener">미리보기</a></div>
+      <div class="acts">
+        <button class="btn primary" data-dl="${x.f}" data-name="${esc(x.dl)}">⬇ 다운로드</button>
+        <button class="btn share" data-share="${tok}" data-title="${esc(x.n)}">↗ 공유</button>
+      </div>
+      <input class="sharebox" type="text" readonly hidden aria-label="공유 링크">
+      ${kind==="pdf"?`<button class="btn" data-text="${esc(x.n.replace(/\s*교육자료$/,"")+" "+PROMPT)}">이 제품 프롬프트 복사</button>`:""}
+      </div></article>`;
+}
+
+function render(id){
+  const s = SETS.find(x => x.id===id) || SETS[0];
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.id===s.id));
+  const link = PAGE_URL + "#" + s.id;
+  $("#panel").innerHTML = `<section class="panel" role="tabpanel">
+    <div class="summary">
+      <img src="${s.cover}" alt="${esc(s.name)}">
+      <div style="min-width:0">
+        <h2>[정기구독] ${esc(s.name)}</h2>
+        <div class="price"><b>${s.price}</b>${s.was?`<s>${s.was}</s>`:""}<span class="bv">BV ${s.bv}</span></div>
+        <ul class="items">${s.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
+        <div class="share">
+          <button class="btn" data-copy="${link}">↗ 이 탭 공유</button>
+          <button class="btn" data-zip="all">이미지+PDF 전체 받기 (ZIP)</button>
+          <input type="text" id="link-${s.id}" value="${link}" readonly hidden style="flex:1 1 220px;min-width:0;font:inherit;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--fg)">
+        </div>
+      </div>
+    </div>
+    <div class="prompt">
+      <span class="label">공유 프롬프트</span>
+      <p>${esc(PROMPT)}</p>
+      <span class="how">PDF를 노트북LM이나 제미나이에 올린 뒤 이 문장을 붙여넣으면 제품 한 장 요약 인포그래픽을 만들 수 있어요.</span>
+      <div class="row"><button class="btn primary" data-text="${esc(PROMPT)}">프롬프트 복사</button></div>
+    </div>
+    <section>
+      <div class="sec-head"><h3>제품 이미지<span>${s.images.length}개</span></h3>
+        <button class="btn" data-zip="images">이미지 전체 받기 (ZIP)</button></div>
+      <div class="grid">${s.images.map(x=>card(x,"img")).join("")}</div>
+    </section>
+    <section>
+      <div class="sec-head"><h3>교육 PDF<span>${s.pdfs.length}개</span></h3>
+        <button class="btn" data-zip="pdfs">PDF 전체 받기 (ZIP)</button></div>
+      <p class="notice">자료 표지 안내대로 내부 교육용 자료예요. 외부 게시·배포는 피해 주세요.</p>
+      <div class="grid pdf-grid">${s.pdfs.map(x=>card(x,"pdf")).join("")}</div>
+    </section></section>`;
+  try{ localStorage.setItem("tab", s.id); }catch(e){}
+  current = s;
+}
+
+let current;
+$("#tabs").innerHTML = SETS.map(s => `<button class="tab" role="tab" data-id="${s.id}">${s.tab}<small>${s.name}</small></button>`).join("");
+$("#tabs").addEventListener("click", e => { const t = e.target.closest(".tab"); if(t) render(t.dataset.id); });
+
+$("#panel").addEventListener("click", e => {
+  const d = e.target.closest("[data-dl]"), z = e.target.closest("[data-zip]"), c = e.target.closest("[data-copy]");
+  if(d){ saveUrl(d.dataset.name, "f/" + d.dataset.dl); toast("저장을 시작했어요: " + d.dataset.name); }
+  if(c) shareOrCopy(`[${current.tab}] ${current.name} 자료`, c.dataset.copy, c.parentElement.querySelector("input"));
+  const sh = e.target.closest("[data-share]");
+  if(sh){
+    const file = [...current.images, ...current.pdfs].find(x => x.f.replace(".","-") === sh.dataset.share);
+    const url = new URL("f/" + file.f, location.href).href;
+    shareOrCopy(`[${current.tab} ${current.name}] ${sh.dataset.title}`, url, sh.closest(".card").querySelector(".sharebox"));
+  }
+  const tx = e.target.closest("[data-text]");
+  if(tx){ navigator.clipboard.writeText(tx.dataset.text).then(()=>toast("프롬프트를 복사했어요."), ()=>{ const r=document.createRange(); const p=tx.closest(".prompt")?.querySelector("p"); if(p){ r.selectNodeContents(p); const s=getSelection(); s.removeAllRanges(); s.addRange(r); } toast("문장을 길게 눌러 복사해 주세요."); }); }
+  if(z) busy(z, "묶는 중…", async () => {
+    if(!window.JSZip){ toast("ZIP 도구를 불러오지 못했어요. 파일별로 받아 주세요."); return; }
+    const kind = z.dataset.zip, s = current, zip = new JSZip();
+    const list = kind==="images" ? s.images : kind==="pdfs" ? s.pdfs : [...s.images, ...s.pdfs];
+    for(const x of list){
+      const folder = kind==="all" ? (x.pages ? "PDF/" : "이미지/") : "";
+      zip.file(folder + x.dl, await getBlob(x.f));
+    }
+    const blob = await zip.generateAsync({type:"blob", compression:"STORE"});
+    const label = kind==="images" ? "이미지" : kind==="pdfs" ? "PDF" : "전체자료";
+    await save(`${s.tab.replace(" ","")}_${s.name.replace(/\s/g,"")}_${label}.zip`, blob);
+  });
+});
+
+let start = location.hash.slice(1), focusTok = null;
+const owner = SETS.find(s => [...s.images, ...s.pdfs].some(x => x.f.replace(".","-") === start));
+if(owner){ focusTok = start; start = owner.id; }
+if(!SETS.some(s => s.id===start)){ try{ start = localStorage.getItem("tab") || "sub1"; }catch(e){ start = "sub1"; } }
+render(start);
+if(focusTok){ const el = document.getElementById(focusTok); if(el){ el.classList.add("hl"); el.scrollIntoView({block:"center"}); } }
+</script>
+</body>
+</html>
